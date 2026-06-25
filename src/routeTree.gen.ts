@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PlaygroundRouteImport } from './routes/playground'
 import { Route as LaunchRouteImport } from './routes/launch'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -27,6 +29,11 @@ import { Route as DocsContributingRouteImport } from './routes/docs.contributing
 import { Route as DocsChangelogRouteImport } from './routes/docs.changelog'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlaygroundRoute = PlaygroundRouteImport.update({
   id: '/playground',
   path: '/playground',
@@ -35,6 +42,11 @@ const PlaygroundRoute = PlaygroundRouteImport.update({
 const LaunchRoute = LaunchRouteImport.update({
   id: '/launch',
   path: '/launch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamplesRoute = ExamplesRouteImport.update({
@@ -118,8 +130,10 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/docs': typeof DocsRouteWithChildren
   '/examples': typeof ExamplesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/launch': typeof LaunchRoute
   '/playground': typeof PlaygroundRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/contributing': typeof DocsContributingRoute
@@ -135,8 +149,10 @@ export interface FileRoutesByTo {
   '/api': typeof ApiRoute
   '/auth': typeof AuthRoute
   '/examples': typeof ExamplesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/launch': typeof LaunchRoute
   '/playground': typeof PlaygroundRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/contributing': typeof DocsContributingRoute
@@ -155,8 +171,10 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/docs': typeof DocsRouteWithChildren
   '/examples': typeof ExamplesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/launch': typeof LaunchRoute
   '/playground': typeof PlaygroundRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/contributing': typeof DocsContributingRoute
@@ -175,8 +193,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/docs'
     | '/examples'
+    | '/forgot-password'
     | '/launch'
     | '/playground'
+    | '/reset-password'
     | '/dashboard'
     | '/docs/changelog'
     | '/docs/contributing'
@@ -192,8 +212,10 @@ export interface FileRouteTypes {
     | '/api'
     | '/auth'
     | '/examples'
+    | '/forgot-password'
     | '/launch'
     | '/playground'
+    | '/reset-password'
     | '/dashboard'
     | '/docs/changelog'
     | '/docs/contributing'
@@ -211,8 +233,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/docs'
     | '/examples'
+    | '/forgot-password'
     | '/launch'
     | '/playground'
+    | '/reset-password'
     | '/_authenticated/dashboard'
     | '/docs/changelog'
     | '/docs/contributing'
@@ -231,12 +255,21 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DocsRoute: typeof DocsRouteWithChildren
   ExamplesRoute: typeof ExamplesRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LaunchRoute: typeof LaunchRoute
   PlaygroundRoute: typeof PlaygroundRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/playground': {
       id: '/playground'
       path: '/playground'
@@ -249,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/launch'
       fullPath: '/launch'
       preLoaderRoute: typeof LaunchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/examples': {
@@ -401,8 +441,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DocsRoute: DocsRouteWithChildren,
   ExamplesRoute: ExamplesRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LaunchRoute: LaunchRoute,
   PlaygroundRoute: PlaygroundRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
