@@ -113,10 +113,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+const THEME_BOOTSTRAP = `(function(){try{var t=localStorage.getItem('nak-theme')||'dark';var r=t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;document.documentElement.classList.toggle('dark',r==='dark');document.documentElement.classList.toggle('light',r==='light');document.documentElement.style.colorScheme=r;}catch(e){}})();`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
         <HeadContent />
       </head>
       <body>
@@ -126,6 +129,7 @@ function RootShell({ children }: { children: ReactNode }) {
     </html>
   );
 }
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -143,7 +147,8 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <Toaster richColors theme="dark" position="top-right" />
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }
+

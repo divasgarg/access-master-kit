@@ -20,6 +20,7 @@ import { Route as ApiRouteImport } from './routes/api'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as DocsTroubleshootingRouteImport } from './routes/docs.troubleshooting'
 import { Route as DocsSecurityRouteImport } from './routes/docs.security'
 import { Route as DocsOauthRouteImport } from './routes/docs.oauth'
 import { Route as DocsMigrationRouteImport } from './routes/docs.migration'
@@ -27,6 +28,8 @@ import { Route as DocsGettingStartedRouteImport } from './routes/docs.getting-st
 import { Route as DocsFaqRouteImport } from './routes/docs.faq'
 import { Route as DocsContributingRouteImport } from './routes/docs.contributing'
 import { Route as DocsChangelogRouteImport } from './routes/docs.changelog'
+import { Route as DocsBestPracticesRouteImport } from './routes/docs.best-practices'
+import { Route as DocsArchitectureRouteImport } from './routes/docs.architecture'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -83,6 +86,11 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsTroubleshootingRoute = DocsTroubleshootingRouteImport.update({
+  id: '/troubleshooting',
+  path: '/troubleshooting',
+  getParentRoute: () => DocsRoute,
+} as any)
 const DocsSecurityRoute = DocsSecurityRouteImport.update({
   id: '/security',
   path: '/security',
@@ -118,6 +126,16 @@ const DocsChangelogRoute = DocsChangelogRouteImport.update({
   path: '/changelog',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsBestPracticesRoute = DocsBestPracticesRouteImport.update({
+  id: '/best-practices',
+  path: '/best-practices',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsArchitectureRoute = DocsArchitectureRouteImport.update({
+  id: '/architecture',
+  path: '/architecture',
+  getParentRoute: () => DocsRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -135,6 +153,8 @@ export interface FileRoutesByFullPath {
   '/playground': typeof PlaygroundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/docs/architecture': typeof DocsArchitectureRoute
+  '/docs/best-practices': typeof DocsBestPracticesRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/contributing': typeof DocsContributingRoute
   '/docs/faq': typeof DocsFaqRoute
@@ -142,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/docs/migration': typeof DocsMigrationRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
+  '/docs/troubleshooting': typeof DocsTroubleshootingRoute
   '/docs/': typeof DocsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -154,6 +175,8 @@ export interface FileRoutesByTo {
   '/playground': typeof PlaygroundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/docs/architecture': typeof DocsArchitectureRoute
+  '/docs/best-practices': typeof DocsBestPracticesRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/contributing': typeof DocsContributingRoute
   '/docs/faq': typeof DocsFaqRoute
@@ -161,6 +184,7 @@ export interface FileRoutesByTo {
   '/docs/migration': typeof DocsMigrationRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
+  '/docs/troubleshooting': typeof DocsTroubleshootingRoute
   '/docs': typeof DocsIndexRoute
 }
 export interface FileRoutesById {
@@ -176,6 +200,8 @@ export interface FileRoutesById {
   '/playground': typeof PlaygroundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/docs/architecture': typeof DocsArchitectureRoute
+  '/docs/best-practices': typeof DocsBestPracticesRoute
   '/docs/changelog': typeof DocsChangelogRoute
   '/docs/contributing': typeof DocsContributingRoute
   '/docs/faq': typeof DocsFaqRoute
@@ -183,6 +209,7 @@ export interface FileRoutesById {
   '/docs/migration': typeof DocsMigrationRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
+  '/docs/troubleshooting': typeof DocsTroubleshootingRoute
   '/docs/': typeof DocsIndexRoute
 }
 export interface FileRouteTypes {
@@ -198,6 +225,8 @@ export interface FileRouteTypes {
     | '/playground'
     | '/reset-password'
     | '/dashboard'
+    | '/docs/architecture'
+    | '/docs/best-practices'
     | '/docs/changelog'
     | '/docs/contributing'
     | '/docs/faq'
@@ -205,6 +234,7 @@ export interface FileRouteTypes {
     | '/docs/migration'
     | '/docs/oauth'
     | '/docs/security'
+    | '/docs/troubleshooting'
     | '/docs/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -217,6 +247,8 @@ export interface FileRouteTypes {
     | '/playground'
     | '/reset-password'
     | '/dashboard'
+    | '/docs/architecture'
+    | '/docs/best-practices'
     | '/docs/changelog'
     | '/docs/contributing'
     | '/docs/faq'
@@ -224,6 +256,7 @@ export interface FileRouteTypes {
     | '/docs/migration'
     | '/docs/oauth'
     | '/docs/security'
+    | '/docs/troubleshooting'
     | '/docs'
   id:
     | '__root__'
@@ -238,6 +271,8 @@ export interface FileRouteTypes {
     | '/playground'
     | '/reset-password'
     | '/_authenticated/dashboard'
+    | '/docs/architecture'
+    | '/docs/best-practices'
     | '/docs/changelog'
     | '/docs/contributing'
     | '/docs/faq'
@@ -245,6 +280,7 @@ export interface FileRouteTypes {
     | '/docs/migration'
     | '/docs/oauth'
     | '/docs/security'
+    | '/docs/troubleshooting'
     | '/docs/'
   fileRoutesById: FileRoutesById
 }
@@ -340,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/troubleshooting': {
+      id: '/docs/troubleshooting'
+      path: '/troubleshooting'
+      fullPath: '/docs/troubleshooting'
+      preLoaderRoute: typeof DocsTroubleshootingRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/security': {
       id: '/docs/security'
       path: '/security'
@@ -389,6 +432,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsChangelogRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/best-practices': {
+      id: '/docs/best-practices'
+      path: '/best-practices'
+      fullPath: '/docs/best-practices'
+      preLoaderRoute: typeof DocsBestPracticesRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/architecture': {
+      id: '/docs/architecture'
+      path: '/architecture'
+      fullPath: '/docs/architecture'
+      preLoaderRoute: typeof DocsArchitectureRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -411,6 +468,8 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface DocsRouteChildren {
+  DocsArchitectureRoute: typeof DocsArchitectureRoute
+  DocsBestPracticesRoute: typeof DocsBestPracticesRoute
   DocsChangelogRoute: typeof DocsChangelogRoute
   DocsContributingRoute: typeof DocsContributingRoute
   DocsFaqRoute: typeof DocsFaqRoute
@@ -418,10 +477,13 @@ interface DocsRouteChildren {
   DocsMigrationRoute: typeof DocsMigrationRoute
   DocsOauthRoute: typeof DocsOauthRoute
   DocsSecurityRoute: typeof DocsSecurityRoute
+  DocsTroubleshootingRoute: typeof DocsTroubleshootingRoute
   DocsIndexRoute: typeof DocsIndexRoute
 }
 
 const DocsRouteChildren: DocsRouteChildren = {
+  DocsArchitectureRoute: DocsArchitectureRoute,
+  DocsBestPracticesRoute: DocsBestPracticesRoute,
   DocsChangelogRoute: DocsChangelogRoute,
   DocsContributingRoute: DocsContributingRoute,
   DocsFaqRoute: DocsFaqRoute,
@@ -429,6 +491,7 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsMigrationRoute: DocsMigrationRoute,
   DocsOauthRoute: DocsOauthRoute,
   DocsSecurityRoute: DocsSecurityRoute,
+  DocsTroubleshootingRoute: DocsTroubleshootingRoute,
   DocsIndexRoute: DocsIndexRoute,
 }
 

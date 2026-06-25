@@ -1,10 +1,13 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Github, Shield, LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { DocsSearch } from "@/components/docs-search";
 
 export function SiteHeader() {
   const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [signedIn, setSignedIn] = useState(false);
   const [initial, setInitial] = useState<string>("?");
 
@@ -27,10 +30,12 @@ export function SiteHeader() {
     router.navigate({ to: "/", replace: true });
   };
 
+  const showSearch = pathname.startsWith("/docs");
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="container-page flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5 group">
+      <div className="container-page flex h-16 items-center justify-between gap-3">
+        <Link to="/" className="flex items-center gap-2.5 group shrink-0">
           <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/30 transition-all group-hover:ring-primary/60">
             <Shield className="h-4 w-4 text-primary" />
           </div>
@@ -58,11 +63,14 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 ml-auto">
+          {showSearch && <DocsSearch />}
+          <ThemeToggle />
           <a
             href="https://github.com"
             target="_blank"
             rel="noreferrer"
+            aria-label="GitHub"
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
           >
             <Github className="h-4 w-4" />
