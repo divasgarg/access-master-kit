@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/site-header";
-import { Shield, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { PasswordField } from "@/components/password-field";
+import { Shield, Loader2, Mail, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { scorePassword } from "@/lib/password";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -30,8 +32,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
-  // Redirect to dashboard if already signed in
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard", replace: true });
@@ -60,17 +62,26 @@ function AuthPage() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    if (mode === "signup" && scorePassword(parsed.data.password).score < 2) {
+      toast.error("Pick a stronger password to continue");
+      return;
+    }
     setLoading("credentials");
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: { emailRedirectTo: `${window.location.origin}/dashboard` },
         });
         if (error) throw error;
-        toast.success("Account created — signing you in…");
         await logAuditEvent("signup", { method: "password" });
+        if (data.session) {
+          toast.success("Account created — signing you in…");
+        } else {
+          setNeedsVerification(true);
+          toast.success("Account created — check your email to verify");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
@@ -80,7 +91,8 @@ function AuthPage() {
         await logAuditEvent("signin", { method: "password" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Authentication failed");
+      const message = err instanceof Error ? err.message : "Authentication failed";
+      toast.error(/invalid login/i.test(message) ? "Invalid email or password" : message);
     } finally {
       setLoading(null);
     }
@@ -89,7 +101,6 @@ function AuthPage() {
   const onOAuth = async (provider: "google" | "github" | "discord") => {
     setLoading(provider);
     try {
-      // GitHub/Discord go through supabase directly; Google goes through Lovable broker.
       if (provider === "google") {
         const result = await lovable.auth.signInWithOAuth("google", {
           redirect_uri: window.location.origin,
@@ -110,6 +121,40 @@ function AuthPage() {
       setLoading(null);
     }
   };
+
+  if (needsVerification) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <SiteHeader />
+        <main className="flex-1 flex items-center justify-center px-4 py-12">
+          <div className="w-full max-w-md text-center">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30 mb-4">
+              <Mail className="h-5 w-5 text-primary" />
+            </div>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">Verify your email</h1>
+            <p className="mt-3 text-sm text-muted-foreground">
+              We sent a confirmation link to <span className="text-foreground">{email}</span>. Click it to activate your
+              account.
+            </p>
+            <div className="mt-6 rounded-2xl border border-border bg-card/60 p-5 text-left text-sm text-muted-foreground">
+              <p className="text-foreground font-medium mb-2">Didn't get it?</p>
+              <ul className="space-y-1 list-disc pl-5 text-xs">
+                <li>Check spam / promotions folders</li>
+                <li>Allow up to a minute for delivery</li>
+                <li>Make sure the address is spelled correctly</li>
+              </ul>
+            </div>
+            <button
+              onClick={() => setNeedsVerification(false)}
+              className="mt-6 text-sm text-primary hover:underline"
+            >
+              ← Use a different email
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -166,12 +211,16 @@ function AuthPage() {
 
             <form onSubmit={onCredentials} className="space-y-3">
               <div>
-                <label className="text-xs font-mono text-muted-foreground">EMAIL</label>
+                <label htmlFor="email" className="text-xs font-mono text-muted-foreground">
+                  EMAIL
+                </label>
                 <div className="mt-1 relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <input
+                    id="email"
                     type="email"
                     required
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@acme.com"
@@ -180,17 +229,26 @@ function AuthPage() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-mono text-muted-foreground">PASSWORD</label>
-                <div className="mt-1 relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                  <input
-                    type="password"
-                    required
-                    minLength={8}
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="text-xs font-mono text-muted-foreground">
+                    PASSWORD
+                  </label>
+                  {mode === "signin" && (
+                    <Link
+                      to="/forgot-password"
+                      className="text-[11px] font-mono text-muted-foreground hover:text-primary"
+                    >
+                      Forgot?
+                    </Link>
+                  )}
+                </div>
+                <div className="mt-1">
+                  <PasswordField
+                    id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
-                    className="w-full pl-9 pr-3 py-2.5 rounded-md bg-background border border-border focus:border-primary outline-none text-sm"
+                    onChange={setPassword}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    showStrength={mode === "signup"}
                   />
                 </div>
               </div>
@@ -217,7 +275,10 @@ function AuthPage() {
 
           <p className="mt-2 text-center text-xs text-muted-foreground">
             By continuing, you agree this is a demo of{" "}
-            <Link to="/" className="hover:text-foreground">next-auth-toolkit</Link>.
+            <Link to="/" className="hover:text-foreground">
+              next-auth-toolkit
+            </Link>
+            .
           </p>
         </div>
       </main>
@@ -236,8 +297,16 @@ function GoogleIcon() {
   );
 }
 function GithubIcon() {
-  return <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.3 1.9 1.3 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.3-3.2-.1-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3" /></svg>;
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
+      <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.3 1.9 1.3 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.3-3.2-.1-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3" />
+    </svg>
+  );
 }
 function DiscordIcon() {
-  return <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.3.5c1.8.4 2.8 1 3.9 1.8a13.3 13.3 0 0 0-11.7-.4l-.5-.2c-.7.2-1.5.6-2.3 1A19.6 19.6 0 0 0 3.7 4.4a20.6 20.6 0 0 0-3.5 14a14 14 0 0 0 4.2 2.1c.3-.4.6-1 .9-1.5-.5-.2-1-.5-1.4-.8.1-.1.2-.2.4-.2a13.6 13.6 0 0 0 12.5 0l.4.2c-.4.3-.9.5-1.4.8.3.5.6 1 .9 1.5a14 14 0 0 0 4.2-2.1 20.6 20.6 0 0 0-3.6-14zM8.5 15c-.9 0-1.7-.9-1.7-1.9s.7-1.9 1.7-1.9 1.7.9 1.7 1.9-.7 1.9-1.7 1.9zm7 0c-.9 0-1.7-.9-1.7-1.9s.7-1.9 1.7-1.9c.9 0 1.7.9 1.7 1.9s-.7 1.9-1.7 1.9z" /></svg>;
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
+      <path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.3.5c1.8.4 2.8 1 3.9 1.8a13.3 13.3 0 0 0-11.7-.4l-.5-.2c-.7.2-1.5.6-2.3 1A19.6 19.6 0 0 0 3.7 4.4a20.6 20.6 0 0 0-3.5 14a14 14 0 0 0 4.2 2.1c.3-.4.6-1 .9-1.5-.5-.2-1-.5-1.4-.8.1-.1.2-.2.4-.2a13.6 13.6 0 0 0 12.5 0l.4.2c-.4.3-.9.5-1.4.8.3.5.6 1 .9 1.5a14 14 0 0 0 4.2-2.1 20.6 20.6 0 0 0-3.6-14zM8.5 15c-.9 0-1.7-.9-1.7-1.9s.7-1.9 1.7-1.9 1.7.9 1.7 1.9-.7 1.9-1.7 1.9zm7 0c-.9 0-1.7-.9-1.7-1.9s.7-1.9 1.7-1.9c.9 0 1.7.9 1.7 1.9s-.7 1.9-1.7 1.9z" />
+    </svg>
+  );
 }

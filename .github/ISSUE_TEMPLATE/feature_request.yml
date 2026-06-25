@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a new feature, provider, or improvement
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: A clear description of the user need. Avoid jumping straight to a solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: I have read the [roadmap](https://github.com/your-org/next-auth-toolkit/blob/main/ROADMAP.md) and this is not already planned.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/your-org/next-auth-toolkit/blob/main/CODE_OF_CONDUCT.md).
+          required: true
