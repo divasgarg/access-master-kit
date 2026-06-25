@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PlaygroundRouteImport } from './routes/playground'
+import { Route as LaunchRouteImport } from './routes/launch'
 import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -19,12 +20,21 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as DocsSecurityRouteImport } from './routes/docs.security'
 import { Route as DocsOauthRouteImport } from './routes/docs.oauth'
+import { Route as DocsMigrationRouteImport } from './routes/docs.migration'
 import { Route as DocsGettingStartedRouteImport } from './routes/docs.getting-started'
+import { Route as DocsFaqRouteImport } from './routes/docs.faq'
+import { Route as DocsContributingRouteImport } from './routes/docs.contributing'
+import { Route as DocsChangelogRouteImport } from './routes/docs.changelog'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const PlaygroundRoute = PlaygroundRouteImport.update({
   id: '/playground',
   path: '/playground',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LaunchRoute = LaunchRouteImport.update({
+  id: '/launch',
+  path: '/launch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamplesRoute = ExamplesRouteImport.update({
@@ -71,9 +81,29 @@ const DocsOauthRoute = DocsOauthRouteImport.update({
   path: '/oauth',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsMigrationRoute = DocsMigrationRouteImport.update({
+  id: '/migration',
+  path: '/migration',
+  getParentRoute: () => DocsRoute,
+} as any)
 const DocsGettingStartedRoute = DocsGettingStartedRouteImport.update({
   id: '/getting-started',
   path: '/getting-started',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsFaqRoute = DocsFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsContributingRoute = DocsContributingRouteImport.update({
+  id: '/contributing',
+  path: '/contributing',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsChangelogRoute = DocsChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
   getParentRoute: () => DocsRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -88,9 +118,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/docs': typeof DocsRouteWithChildren
   '/examples': typeof ExamplesRoute
+  '/launch': typeof LaunchRoute
   '/playground': typeof PlaygroundRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/docs/changelog': typeof DocsChangelogRoute
+  '/docs/contributing': typeof DocsContributingRoute
+  '/docs/faq': typeof DocsFaqRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
+  '/docs/migration': typeof DocsMigrationRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
   '/docs/': typeof DocsIndexRoute
@@ -100,9 +135,14 @@ export interface FileRoutesByTo {
   '/api': typeof ApiRoute
   '/auth': typeof AuthRoute
   '/examples': typeof ExamplesRoute
+  '/launch': typeof LaunchRoute
   '/playground': typeof PlaygroundRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/docs/changelog': typeof DocsChangelogRoute
+  '/docs/contributing': typeof DocsContributingRoute
+  '/docs/faq': typeof DocsFaqRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
+  '/docs/migration': typeof DocsMigrationRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
   '/docs': typeof DocsIndexRoute
@@ -115,9 +155,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/docs': typeof DocsRouteWithChildren
   '/examples': typeof ExamplesRoute
+  '/launch': typeof LaunchRoute
   '/playground': typeof PlaygroundRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/docs/changelog': typeof DocsChangelogRoute
+  '/docs/contributing': typeof DocsContributingRoute
+  '/docs/faq': typeof DocsFaqRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
+  '/docs/migration': typeof DocsMigrationRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
   '/docs/': typeof DocsIndexRoute
@@ -130,9 +175,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/docs'
     | '/examples'
+    | '/launch'
     | '/playground'
     | '/dashboard'
+    | '/docs/changelog'
+    | '/docs/contributing'
+    | '/docs/faq'
     | '/docs/getting-started'
+    | '/docs/migration'
     | '/docs/oauth'
     | '/docs/security'
     | '/docs/'
@@ -142,9 +192,14 @@ export interface FileRouteTypes {
     | '/api'
     | '/auth'
     | '/examples'
+    | '/launch'
     | '/playground'
     | '/dashboard'
+    | '/docs/changelog'
+    | '/docs/contributing'
+    | '/docs/faq'
     | '/docs/getting-started'
+    | '/docs/migration'
     | '/docs/oauth'
     | '/docs/security'
     | '/docs'
@@ -156,9 +211,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/docs'
     | '/examples'
+    | '/launch'
     | '/playground'
     | '/_authenticated/dashboard'
+    | '/docs/changelog'
+    | '/docs/contributing'
+    | '/docs/faq'
     | '/docs/getting-started'
+    | '/docs/migration'
     | '/docs/oauth'
     | '/docs/security'
     | '/docs/'
@@ -171,6 +231,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DocsRoute: typeof DocsRouteWithChildren
   ExamplesRoute: typeof ExamplesRoute
+  LaunchRoute: typeof LaunchRoute
   PlaygroundRoute: typeof PlaygroundRoute
 }
 
@@ -181,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/playground'
       fullPath: '/playground'
       preLoaderRoute: typeof PlaygroundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/launch': {
+      id: '/launch'
+      path: '/launch'
+      fullPath: '/launch'
+      preLoaderRoute: typeof LaunchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/examples': {
@@ -246,11 +314,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsOauthRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/migration': {
+      id: '/docs/migration'
+      path: '/migration'
+      fullPath: '/docs/migration'
+      preLoaderRoute: typeof DocsMigrationRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/getting-started': {
       id: '/docs/getting-started'
       path: '/getting-started'
       fullPath: '/docs/getting-started'
       preLoaderRoute: typeof DocsGettingStartedRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/faq': {
+      id: '/docs/faq'
+      path: '/faq'
+      fullPath: '/docs/faq'
+      preLoaderRoute: typeof DocsFaqRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/contributing': {
+      id: '/docs/contributing'
+      path: '/contributing'
+      fullPath: '/docs/contributing'
+      preLoaderRoute: typeof DocsContributingRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/changelog': {
+      id: '/docs/changelog'
+      path: '/changelog'
+      fullPath: '/docs/changelog'
+      preLoaderRoute: typeof DocsChangelogRouteImport
       parentRoute: typeof DocsRoute
     }
     '/_authenticated/dashboard': {
@@ -275,14 +371,22 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface DocsRouteChildren {
+  DocsChangelogRoute: typeof DocsChangelogRoute
+  DocsContributingRoute: typeof DocsContributingRoute
+  DocsFaqRoute: typeof DocsFaqRoute
   DocsGettingStartedRoute: typeof DocsGettingStartedRoute
+  DocsMigrationRoute: typeof DocsMigrationRoute
   DocsOauthRoute: typeof DocsOauthRoute
   DocsSecurityRoute: typeof DocsSecurityRoute
   DocsIndexRoute: typeof DocsIndexRoute
 }
 
 const DocsRouteChildren: DocsRouteChildren = {
+  DocsChangelogRoute: DocsChangelogRoute,
+  DocsContributingRoute: DocsContributingRoute,
+  DocsFaqRoute: DocsFaqRoute,
   DocsGettingStartedRoute: DocsGettingStartedRoute,
+  DocsMigrationRoute: DocsMigrationRoute,
   DocsOauthRoute: DocsOauthRoute,
   DocsSecurityRoute: DocsSecurityRoute,
   DocsIndexRoute: DocsIndexRoute,
@@ -297,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DocsRoute: DocsRouteWithChildren,
   ExamplesRoute: ExamplesRoute,
+  LaunchRoute: LaunchRoute,
   PlaygroundRoute: PlaygroundRoute,
 }
 export const routeTree = rootRouteImport
