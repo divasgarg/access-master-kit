@@ -12,12 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PlaygroundRouteImport } from './routes/playground'
 import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ApiRouteImport } from './routes/api'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as DocsSecurityRouteImport } from './routes/docs.security'
 import { Route as DocsOauthRouteImport } from './routes/docs.oauth'
 import { Route as DocsGettingStartedRouteImport } from './routes/docs.getting-started'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const PlaygroundRoute = PlaygroundRouteImport.update({
   id: '/playground',
@@ -34,9 +37,18 @@ const DocsRoute = DocsRouteImport.update({
   path: '/docs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiRoute = ApiRouteImport.update({
   id: '/api',
   path: '/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -64,13 +76,20 @@ const DocsGettingStartedRoute = DocsGettingStartedRouteImport.update({
   path: '/getting-started',
   getParentRoute: () => DocsRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api': typeof ApiRoute
+  '/auth': typeof AuthRoute
   '/docs': typeof DocsRouteWithChildren
   '/examples': typeof ExamplesRoute
   '/playground': typeof PlaygroundRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
@@ -79,8 +98,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api': typeof ApiRoute
+  '/auth': typeof AuthRoute
   '/examples': typeof ExamplesRoute
   '/playground': typeof PlaygroundRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
@@ -89,10 +110,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/api': typeof ApiRoute
+  '/auth': typeof AuthRoute
   '/docs': typeof DocsRouteWithChildren
   '/examples': typeof ExamplesRoute
   '/playground': typeof PlaygroundRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
   '/docs/oauth': typeof DocsOauthRoute
   '/docs/security': typeof DocsSecurityRoute
@@ -103,9 +127,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/api'
+    | '/auth'
     | '/docs'
     | '/examples'
     | '/playground'
+    | '/dashboard'
     | '/docs/getting-started'
     | '/docs/oauth'
     | '/docs/security'
@@ -114,8 +140,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/api'
+    | '/auth'
     | '/examples'
     | '/playground'
+    | '/dashboard'
     | '/docs/getting-started'
     | '/docs/oauth'
     | '/docs/security'
@@ -123,10 +151,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/api'
+    | '/auth'
     | '/docs'
     | '/examples'
     | '/playground'
+    | '/_authenticated/dashboard'
     | '/docs/getting-started'
     | '/docs/oauth'
     | '/docs/security'
@@ -135,7 +166,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ApiRoute: typeof ApiRoute
+  AuthRoute: typeof AuthRoute
   DocsRoute: typeof DocsRouteWithChildren
   ExamplesRoute: typeof ExamplesRoute
   PlaygroundRoute: typeof PlaygroundRoute
@@ -164,11 +197,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api': {
       id: '/api'
       path: '/api'
       fullPath: '/api'
       preLoaderRoute: typeof ApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -206,8 +253,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsGettingStartedRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface DocsRouteChildren {
   DocsGettingStartedRoute: typeof DocsGettingStartedRoute
@@ -227,7 +292,9 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ApiRoute: ApiRoute,
+  AuthRoute: AuthRoute,
   DocsRoute: DocsRouteWithChildren,
   ExamplesRoute: ExamplesRoute,
   PlaygroundRoute: PlaygroundRoute,

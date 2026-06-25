@@ -42,13 +42,13 @@ function AuthPage() {
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
-  const logAuditEvent = async (event: string, detail: Record<string, unknown> = {}) => {
+  const logAuditEvent = async (event: string, detail: Record<string, string> = {}) => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) return;
     await supabase.from("audit_logs").insert({
       user_id: data.user.id,
       event,
-      detail,
+      detail: detail as never,
       user_agent: navigator.userAgent,
     });
   };
