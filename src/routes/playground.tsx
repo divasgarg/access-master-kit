@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useState } from "react";
@@ -220,14 +220,23 @@ function Playground() {
                 </div>
                 <h2 className="font-display text-2xl font-semibold">You're signed in</h2>
                 <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-                  Session created. Expires in 30 days. In a real app, you'd be redirected to your dashboard.
+                  This was a simulation. Want to try the real thing? Sign up below and you'll get a real JWT session,
+                  a row in the database, and an audit log.
                 </p>
-                <button
-                  onClick={() => { setFlow("menu"); setEmail(""); setOtp(""); append("Session revoked."); }}
-                  className="mt-6 inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-card transition-colors"
-                >
-                  Sign out & reset
-                </button>
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                  <Link
+                    to="/auth"
+                    className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:brightness-110 transition-all"
+                  >
+                    Try real auth
+                  </Link>
+                  <button
+                    onClick={() => { setFlow("menu"); setEmail(""); setOtp(""); append("Session revoked."); }}
+                    className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-card transition-colors"
+                  >
+                    Reset
+                  </button>
+                </div>
               </div>
             )}
           </div>
