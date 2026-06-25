@@ -1,7 +1,32 @@
-import { Link } from "@tanstack/react-router";
-import { Github, Shield } from "lucide-react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Github, Shield, LogOut } from "lucide-react";
 
 export function SiteHeader() {
+  const router = useRouter();
+  const [signedIn, setSignedIn] = useState(false);
+  const [initial, setInitial] = useState<string>("?");
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      const u = data.session?.user;
+      setSignedIn(!!u);
+      if (u?.email) setInitial(u.email[0].toUpperCase());
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      const u = session?.user;
+      setSignedIn(!!u);
+      if (u?.email) setInitial(u.email[0].toUpperCase());
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.navigate({ to: "/", replace: true });
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between">
@@ -43,12 +68,33 @@ export function SiteHeader() {
             <Github className="h-4 w-4" />
             <span className="font-mono text-xs">12.4k</span>
           </a>
-          <Link
-            to="/docs/getting-started"
-            className="rounded-md bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground transition-all hover:brightness-110 glow-ring"
-          >
-            Get started
-          </Link>
+
+          {signedIn ? (
+            <>
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-2 px-2.5 py-1 rounded-md hover:bg-muted/50 transition-colors"
+                aria-label="Dashboard"
+              >
+                <div className="h-7 w-7 rounded-full bg-primary/15 ring-1 ring-primary/40 flex items-center justify-center text-xs font-semibold text-primary">
+                  {initial}
+                </div>
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-card transition-colors"
+              >
+                <LogOut className="h-3.5 w-3.5" /> Sign out
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              className="rounded-md bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground transition-all hover:brightness-110 glow-ring"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </div>
     </header>

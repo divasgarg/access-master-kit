@@ -35,6 +35,16 @@ const sections = [
       { label: "Adapters", to: "/docs" },
     ],
   },
+  {
+    title: "Community",
+    items: [
+      { label: "FAQ", to: "/docs/faq" },
+      { label: "Migration Guide", to: "/docs/migration" },
+      { label: "Changelog", to: "/docs/changelog" },
+      { label: "Contributing", to: "/docs/contributing" },
+      { label: "Launch Kit", to: "/launch" },
+    ],
+  },
 ];
 
 export function DocsSidebar() {
