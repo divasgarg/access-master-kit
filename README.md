@@ -1,8 +1,8 @@
 <div align="center">
 
-# next-auth-toolkit
+# Access Master Kit
 
-**The end-to-end authentication platform for modern web apps.**
+**Authentication dashboard and developer playground built with React and TanStack Start.**
 Email & password, OAuth (Google · GitHub · Discord), JWT sessions, RBAC, API keys, audit logs — wired into a polished developer dashboard and live playground.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-amber.svg)](./LICENSE)
